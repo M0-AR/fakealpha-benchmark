@@ -21,11 +21,13 @@
 
 ### See it in 60 seconds
 
-[![FakeAlpha interactive brief](assets/demo.gif)](preview.html)
+[![FakeAlpha interactive brief](assets/demo.gif)](https://m0-ar.github.io/fakealpha-benchmark/preview.html)
 
-**[Open the interactive brief →](preview.html)** · **[Read the paper →](paper/paper.md)** · **[Take the quiz →](preview.html#quiz)** · **[Use the checklist →](preview.html#checklist)**
+**[Open the interactive brief →](https://m0-ar.github.io/fakealpha-benchmark/preview.html)** · **[Read the paper →](paper/paper.md)** · **[Take the quiz →](https://m0-ar.github.io/fakealpha-benchmark/preview.html#quiz)** · **[Use the checklist →](https://m0-ar.github.io/fakealpha-benchmark/preview.html#checklist)**
 
 The brief is a single static HTML page: the evidence, the six leak families, a plain-English beginner path, an interactive quiz, and a review checklist. No build step, no tracking, no sign-up.
+
+**Live pages (GitHub Pages):** [home](https://m0-ar.github.io/fakealpha-benchmark/) · [brief](https://m0-ar.github.io/fakealpha-benchmark/preview.html) · [docs mirror](https://m0-ar.github.io/fakealpha-benchmark/docs/preview.html). All three URLs open the same page when Pages is enabled with source `main` / `(root)`.
 
 ### What this is, in plain English
 
@@ -43,11 +45,11 @@ This benchmark builds two versions of the same pipeline — one honest, one deli
 
 | You are | What you get | Start here |
 |---|---|---|
-| **Portfolio manager / investment committee** | A defensible way to challenge a backtest before capital is allocated | [The one-minute version](#the-one-minute-version) · [Checklist](preview.html#checklist) |
+| **Portfolio manager / investment committee** | A defensible way to challenge a backtest before capital is allocated | [The one-minute version](#the-one-minute-version) · [Checklist](https://m0-ar.github.io/fakealpha-benchmark/preview.html#checklist) |
 | **Quant researcher** | A paired benchmark for testing diagnostics, plus reusable code and tests | [Results](#6-results) · [Quickstart](#from-clone-to-evidence-in-three-commands) |
 | **Risk, model validation, or compliance** | Evidence that publication statistics are not validity checks, and an audit protocol | [The evidence table](#the-evidence-in-one-table) · [Protocol](docs/protocol.md) |
-| **Data scientist / ML engineer** | Concrete time-series leakage patterns and a causal walk-forward example | [Leak library](preview.html#leaks) · [Beginner guide](#-beginner-guide--read-this-and-you-are-a-professional) |
-| **Teacher, student, or interviewer** | A ready-made lab, a 12-question quiz, and a shared vocabulary | [Beginner guide](#-beginner-guide--read-this-and-you-are-a-professional) · [Quiz](preview.html#quiz) |
+| **Data scientist / ML engineer** | Concrete time-series leakage patterns and a causal walk-forward example | [Leak library](https://m0-ar.github.io/fakealpha-benchmark/preview.html#leaks) · [Beginner guide](#-beginner-guide--read-this-and-you-are-a-professional) |
+| **Teacher, student, or interviewer** | A ready-made lab, a 12-question quiz, and a shared vocabulary | [Beginner guide](#-beginner-guide--read-this-and-you-are-a-professional) · [Quiz](https://m0-ar.github.io/fakealpha-benchmark/preview.html#quiz) |
 | **Analyst, writer, or curator** | Calibrated numbers and a clear explanation of why a high Sharpe is a claim | [Research abstract](#research-abstract) · [FAQ](#questions-a-smart-reader-asks) |
 | **Platform or reproducibility engineer** | Pinned environment, data hashes, tests, and a one-command Docker run | [Quickstart](#from-clone-to-evidence-in-three-commands) · [Docker](#docker) |
 
@@ -65,7 +67,7 @@ This benchmark builds two versions of the same pipeline — one honest, one deli
 
 ## 🌱 Beginner guide — read this and you are a professional
 
-> **No finance degree required.** If you can follow a weather forecast, you can follow a backtest. This guide builds the idea from zero, and the [interactive quiz](preview.html#quiz) checks what stuck. Work through it and you will know more than most interview candidates.
+> **No finance degree required.** If you can follow a weather forecast, you can follow a backtest. This guide builds the idea from zero, and the [interactive quiz](https://m0-ar.github.io/fakealpha-benchmark/preview.html#quiz) checks what stuck. Work through it and you will know more than most interview candidates.
 
 ### 1. Four words, one story
 
@@ -134,11 +136,11 @@ The central conclusion is negative and practical: **no returns-only statistic es
 
 ### 8. The 20-minute path from zero to useful
 
-1. **Take the quiz.** Twelve questions, instant explanations, no sign-up: [preview.html#quiz](preview.html#quiz). A score of 8 or more means the core model is in place.
-2. **Read one leak.** Open the [leak library](preview.html#leaks) and compare the Sharpe lift with what each diagnostic catches. The gap between "big effect" and "easy to detect" is the lesson.
+1. **Take the quiz.** Twelve questions, instant explanations, no sign-up: [preview.html#quiz](https://m0-ar.github.io/fakealpha-benchmark/preview.html#quiz). A score of 8 or more means the core model is in place.
+2. **Read one leak.** Open the [leak library](https://m0-ar.github.io/fakealpha-benchmark/preview.html#leaks) and compare the Sharpe lift with what each diagnostic catches. The gap between "big effect" and "easy to detect" is the lesson.
 3. **Run one command.** `docker compose run --rm fakealpha` reproduces the tables and figures from the committed processed panel. No network or API key is required.
 4. **Open the evidence.** Read `results/tables/summary.csv` next to `results/tables/honest_controls.csv`. The false-positive rate is not a footnote; it is the calibration that makes the detection numbers meaningful.
-5. **Apply the checklist.** Take the eight questions in [preview.html#checklist](preview.html#checklist) to a real backtest review. A gap is not an accusation; it is the next question to ask.
+5. **Apply the checklist.** Take the eight questions in [preview.html#checklist](https://m0-ar.github.io/fakealpha-benchmark/preview.html#checklist) to a real backtest review. A gap is not an accusation; it is the next question to ask.
 
 ### 9. Plain-English glossary
 
@@ -231,15 +233,30 @@ The Compose service runs `python -m fakealpha reproduce --config config/experime
 
 ## Publish this page with GitHub Pages
 
-The interactive brief is designed to be the public face of the repository. It is a static HTML file with relative asset paths, so GitHub Pages can serve it directly.
+The interactive brief is designed to be the public face of the repository. It is a static HTML file with relative asset paths, so GitHub Pages can serve it directly. The canonical page is `preview.html` at the repository root; `docs/preview.html` and `docs/index.html` are small redirect mirrors so all three entry URLs resolve.
 
 1. Push the repository to GitHub.
 2. Open **Settings → Pages**.
 3. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
-4. Choose branch **`main`** and folder **`/ (root)`**, then **Save**.
-5. Wait for the deployment, then open `https://<your-user>.github.io/<your-repo>/`.
+4. Choose branch **`main`** and folder **`/ (root)`**, then **Save**. Do not choose `/docs`: the canonical page is at the root.
+5. Wait for the deployment, then open any of these:
+   - <https://m0-ar.github.io/fakealpha-benchmark/>
+   - <https://m0-ar.github.io/fakealpha-benchmark/preview.html>
+   - <https://m0-ar.github.io/fakealpha-benchmark/docs/preview.html>
 
-`index.html` forwards visitors to `preview.html`; `.nojekyll` keeps the asset paths exactly as written. The root `README.md`, `paper/`, `docs/`, and `results/` remain directly browsable. To set the link preview card, upload [`assets/social-preview.png`](assets/social-preview.png) under **Settings → General → Social preview**.
+`index.html` forwards visitors to `preview.html`. `.nojekyll` keeps the asset paths exactly as written. The root `README.md`, `paper/`, `docs/`, and `results/` remain directly browsable. To set the link preview card, upload [`assets/social-preview.png`](assets/social-preview.png) under **Settings → General → Social preview**.
+
+Check all three paths in ten seconds:
+
+```bash
+BASE=https://m0-ar.github.io/fakealpha-benchmark
+for p in "" preview.html docs/preview.html; do
+  printf '/%s -> ' "$p"
+  curl -s -o /dev/null -w '%{http_code}\n' "$BASE/$p"
+done
+```
+
+A green Pages deployment only proves that a site was built. It does not prove that your path exists under the configured source. If `/` and `/preview.html` return 200 but `/docs/preview.html` returns 404, the `docs/` mirror was not pushed. If `/preview.html` returns 404 while `/docs/preview.html` returns 200, the Pages source is set to `/docs` instead of `/ (root)`.
 
 ---
 
@@ -989,6 +1006,8 @@ fakealpha-benchmark/
 ├── README.md                  # this document: executive brief + paper + guide
 ├── preview.html               # interactive brief: evidence, quiz, checklist
 ├── index.html                 # GitHub Pages entry point -> preview.html
+├── docs/index.html            # /docs/ mirror -> ../preview.html
+├── docs/preview.html          # /docs/preview.html mirror -> ../preview.html
 ├── .nojekyll                  # serve asset paths exactly as written
 ├── LICENSE                    # MIT
 ├── pyproject.toml             # package, CLI, pytest, ruff
@@ -1010,7 +1029,7 @@ fakealpha-benchmark/
 ├── results/tables/            # per_replicate, summary, honest_controls, thresholds
 ├── results/figures/           # paper figures + evidence charts
 ├── paper/                     # manuscript source and references
-├── docs/                      # protocol, data card, model card
+├── docs/                      # protocol, data card, model card, Pages mirrors
 └── Dockerfile, docker-compose.yml
 ```
 

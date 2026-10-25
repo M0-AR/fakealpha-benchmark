@@ -1,0 +1,13 @@
+services:
+  fakealpha:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m fakealpha reproduce --config config/experiment.yaml
+    environment:
+      MPLBACKEND: Agg
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+    init: true
+    shm_size: "1gb"

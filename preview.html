@@ -1,0 +1,1793 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FakeAlpha Benchmark — Leakage Looks Like Alpha</title>
+  <meta name="description" content="A paired, live-market benchmark for detecting contaminated systematic backtests. 560 runs, six leak families, and a plain-English guide to what actually catches a fake edge.">
+  <meta name="theme-color" content="#071b16">
+  <meta property="og:title" content="FakeAlpha Benchmark — Leakage Looks Like Alpha">
+  <meta property="og:description" content="A high Sharpe can be a leak, not skill. Explore the evidence, take the quiz, and use the checklist.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f1e8;
+      --surface: #fffdf8;
+      --surface-2: #ecefe6;
+      --ink: #10231f;
+      --muted: #5d6f68;
+      --line: #d7dccf;
+      --line-strong: #b8c3b7;
+      --accent: #0c7a63;
+      --accent-soft: #e3f2ea;
+      --accent-2: #c46a1a;
+      --accent-3: #d9f36a;
+      --danger: #b42318;
+      --danger-soft: #fde7e3;
+      --track: #e5e9df;
+      --hero: #071b16;
+      --hero-2: #0c2820;
+      --hero-text: #f4f1e8;
+      --hero-muted: #b9c9c1;
+      --shadow: 0 18px 50px rgba(16, 35, 31, 0.09);
+      --shadow-soft: 0 8px 24px rgba(16, 35, 31, 0.06);
+      --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Consolas, "Liberation Mono", monospace;
+      --radius: 22px;
+      --wrap: 1180px;
+    }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #061510;
+      --surface: #0b211b;
+      --surface-2: #0e2a22;
+      --ink: #eef5ec;
+      --muted: #a9bbb2;
+      --line: #213d34;
+      --line-strong: #34554a;
+      --accent: #6fe0b8;
+      --accent-soft: #10392f;
+      --accent-2: #f2a25c;
+      --accent-3: #d9f36a;
+      --danger: #ff8a7a;
+      --danger-soft: #3a1b18;
+      --track: #17362c;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      line-height: 1.62;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    ::selection { background: var(--accent-3); color: #071b16; }
+    :focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
+    .wrap { width: min(var(--wrap), calc(100% - 40px)); margin-inline: auto; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: fixed; left: 16px; top: -80px; z-index: 200;
+      background: var(--accent-3); color: #071b16; padding: 10px 16px;
+      border-radius: 999px; font-weight: 800; text-decoration: none;
+    }
+    .skip-link:focus { top: 12px; }
+    .scroll-progress {
+      position: fixed; inset: 0 auto auto 0; z-index: 210; height: 3px;
+      width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-3));
+    }
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7, 27, 22, 0.92);
+      color: var(--hero-text);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(18px);
+    }
+    .header-inner {
+      min-height: 68px; display: flex; align-items: center; gap: 22px;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 11px;
+      text-decoration: none; font-weight: 800; letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+    .brand img { width: 34px; height: 34px; border-radius: 10px; }
+    .brand small {
+      display: block; color: var(--hero-muted); font-size: 0.63rem;
+      font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .site-nav { display: flex; align-items: center; gap: 3px; margin-left: auto; }
+    .site-nav a {
+      color: var(--hero-muted); text-decoration: none; font-size: 0.82rem;
+      font-weight: 650; padding: 9px 11px; border-radius: 999px;
+    }
+    .site-nav a:hover, .site-nav a.active { color: var(--hero-text); background: rgba(255, 255, 255, 0.08); }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 38px; height: 38px; display: grid; place-items: center;
+      border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.16);
+      background: transparent; color: var(--hero-text); cursor: pointer;
+    }
+    .icon-btn:hover { background: rgba(255, 255, 255, 0.08); }
+    .icon-btn svg { width: 18px; height: 18px; }
+    .nav-toggle { display: none; }
+    .nav-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent-3); color: #071b16; text-decoration: none;
+      padding: 10px 16px; border-radius: 999px; font-size: 0.8rem; font-weight: 800;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { transform: translateY(-1px); }
+    .hero {
+      position: relative; overflow: hidden; color: var(--hero-text);
+      background:
+        radial-gradient(900px 520px at 82% 8%, rgba(111, 224, 184, 0.16), transparent 62%),
+        radial-gradient(700px 460px at 8% 100%, rgba(217, 243, 106, 0.09), transparent 60%),
+        var(--hero);
+      padding: 76px 0 72px;
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+    .hero::after {
+      content: ""; position: absolute; width: 520px; height: 520px;
+      right: -180px; bottom: -260px; border-radius: 50%;
+      border: 1px solid rgba(217, 243, 106, 0.16);
+      box-shadow: 0 0 0 80px rgba(217, 243, 106, 0.03), 0 0 0 160px rgba(217, 243, 106, 0.02);
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1.06fr 0.94fr;
+      gap: 56px; align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px; margin: 0 0 20px;
+      color: var(--accent-3); font-size: 0.72rem; font-weight: 800;
+      letter-spacing: 0.16em; text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: ""; width: 26px; height: 1px; background: var(--accent-3);
+    }
+    h1 {
+      margin: 0; font-family: var(--font-serif); font-weight: 500;
+      font-size: clamp(3.6rem, 7.7vw, 6.9rem); line-height: 0.92;
+      letter-spacing: -0.055em;
+    }
+    h1 em { color: var(--accent-3); font-style: italic; }
+    .lede {
+      max-width: 630px; margin: 26px 0 0; color: #c9d8d0;
+      font-size: clamp(1.02rem, 1.5vw, 1.18rem); line-height: 1.7;
+    }
+    .lede strong { color: #fff; font-weight: 750; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-height: 48px; padding: 12px 21px; border-radius: 999px;
+      border: 1px solid transparent; text-decoration: none; font-weight: 800;
+      font-size: 0.88rem; cursor: pointer; transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--accent-3); color: #071b16; }
+    .btn-primary:hover { background: #e6ff8a; }
+    .btn-ghost { border-color: rgba(255, 255, 255, 0.22); color: var(--hero-text); background: rgba(255, 255, 255, 0.03); }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.08); }
+    .btn-dark { background: var(--ink); color: var(--paper); }
+    .btn-line { border-color: var(--line-strong); color: var(--ink); background: transparent; }
+    .btn svg { width: 16px; height: 16px; }
+    .hero-stats {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px; margin-top: 34px; max-width: 620px;
+    }
+    .hero-stat { border-left: 1px solid rgba(255, 255, 255, 0.16); padding-left: 14px; }
+    .hero-stat b {
+      display: block; font-family: var(--font-mono); font-size: 1.22rem;
+      color: #fff; letter-spacing: -0.03em; line-height: 1.2;
+    }
+    .hero-stat span { display: block; color: var(--hero-muted); font-size: 0.69rem; line-height: 1.35; margin-top: 4px; }
+    .hero-visual { position: relative; }
+    .terminal {
+      overflow: hidden; border-radius: 20px; border: 1px solid rgba(217, 243, 106, 0.18);
+      background: #0a211a; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      transform: rotate(0.6deg);
+    }
+    .terminal-bar {
+      display: flex; align-items: center; gap: 6px; padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.03);
+    }
+    .terminal-bar i { width: 8px; height: 8px; border-radius: 50%; background: #35564b; }
+    .terminal-bar i:nth-child(1) { background: #e07a2f; }
+    .terminal-bar i:nth-child(2) { background: #d9f36a; }
+    .terminal-bar i:nth-child(3) { background: #6fe0b8; }
+    .terminal-bar span { margin-left: auto; color: #7f9a8f; font-family: var(--font-mono); font-size: 0.62rem; }
+    .terminal pre {
+      margin: 0; padding: 22px; overflow-x: auto; color: #cfe0d6;
+      font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.92;
+    }
+    .t-dim { color: #7f9a8f; }
+    .t-ok { color: #8be9c3; }
+    .t-key { color: #d9f36a; }
+    .t-warn { color: #f2a25c; }
+    .terminal-note {
+      color: #7f9a8f; font-size: 0.66rem; padding: 0 22px 18px;
+      display: flex; justify-content: space-between; gap: 16px;
+    }
+    .hero-card {
+      margin: 18px 0 0 28px; padding: 18px 20px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px;
+      background: rgba(255, 255, 255, 0.055); backdrop-filter: blur(12px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+    }
+    .hero-card-head { display: flex; justify-content: space-between; gap: 18px; align-items: baseline; margin-bottom: 12px; }
+    .hero-card-head b { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #d9f36a; }
+    .hero-card-head span { color: #8ea69c; font-size: 0.65rem; }
+    .mini-row {
+      display: grid; grid-template-columns: 104px 1fr 42px; gap: 10px;
+      align-items: center; margin: 9px 0; font-size: 0.7rem; color: #b9c9c1;
+    }
+    .mini-row b { color: #fff; font-family: var(--font-mono); font-weight: 500; text-align: right; font-size: 0.68rem; }
+    .mini-track { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.09); overflow: hidden; }
+    .mini-track i {
+      display: block; height: 100%; width: 0; border-radius: inherit;
+      background: linear-gradient(90deg, #0c7a63, #6fe0b8);
+      animation: grow 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    }
+    .mini-track i.hot { background: linear-gradient(90deg, #c46a1a, #f2a25c); }
+    .mini-note { margin: 12px 0 0; color: #8ea69c; font-size: 0.62rem; line-height: 1.5; }
+    @keyframes grow { to { width: var(--w); } }
+    .ticker {
+      background: var(--accent-3); color: #071b16; border-bottom: 1px solid rgba(7, 27, 22, 0.18);
+      padding: 12px 0; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .ticker-track { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px; text-align: center; }
+    .ticker-track span { white-space: nowrap; }
+    .section { padding: 92px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 82px; }
+    .section-tight { padding-top: 72px; padding-bottom: 72px; }
+    .section-alt { background: var(--surface-2); }
+    .section-dark { background: #071b16; color: var(--hero-text); border-bottom-color: rgba(255, 255, 255, 0.12); }
+    .section-dark .section-head p, .section-dark .muted { color: var(--hero-muted); }
+    .section-head {
+      display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 20px;
+      align-items: start; max-width: 980px; margin-bottom: 38px;
+    }
+    .section-no {
+      color: var(--accent); font-family: var(--font-mono); font-size: 0.72rem;
+      letter-spacing: 0.12em; padding-top: 9px;
+    }
+    h2 {
+      margin: 0; font-family: var(--font-serif); font-weight: 500;
+      font-size: clamp(2.15rem, 4.2vw, 3.45rem); line-height: 1.04; letter-spacing: -0.035em;
+    }
+    .section-head p { margin: 14px 0 0; max-width: 710px; color: var(--muted); font-size: 1.02rem; }
+    .section-head p strong { color: var(--ink); }
+    .grid-2, .grid-3, .grid-4 { display: grid; gap: 18px; }
+    .split > *, .grid-2 > *, .grid-3 > *, .grid-4 > * { min-width: 0; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card {
+      position: relative; background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-soft);
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--line-strong); }
+    .card h3 { margin: 14px 0 8px; font-size: 1.03rem; line-height: 1.3; letter-spacing: -0.015em; }
+    .card p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.62; }
+    .card p + p { margin-top: 10px; }
+    .icon {
+      width: 38px; height: 38px; display: grid; place-items: center;
+      border-radius: 12px; background: var(--accent-soft); color: var(--accent);
+    }
+    .icon svg { width: 19px; height: 19px; }
+    .icon.warm { background: #fbeadb; color: #b25a14; }
+    .icon.lime { background: #eef8c7; color: #4c6511; }
+    [data-theme="dark"] .icon.warm { background: #3a2516; color: #f2a25c; }
+    [data-theme="dark"] .icon.lime { background: #26320d; color: #d9f36a; }
+    .card-kicker {
+      display: inline-block; color: var(--accent); font-family: var(--font-mono);
+      font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .card.dark { background: #0b211b; border-color: #1d3c32; color: var(--hero-text); }
+    .card.dark p { color: #b9c9c1; }
+    .card.dark h3 { color: #fff; }
+    .callout {
+      display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start;
+      margin-top: 22px; padding: 22px 24px; border-radius: 18px;
+      background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--line));
+    }
+    .callout-mark {
+      width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px;
+      background: var(--accent); color: var(--paper); font-weight: 900;
+    }
+    .callout p { margin: 0; font-size: 0.94rem; }
+    .callout strong { color: var(--ink); }
+    .split { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 38px; align-items: start; }
+    .sticky-note {
+      position: sticky; top: 92px; padding: 24px; border-radius: var(--radius);
+      background: var(--ink); color: var(--paper); box-shadow: var(--shadow);
+    }
+    [data-theme="dark"] .sticky-note { background: #0b211b; color: var(--ink); border: 1px solid var(--line); }
+    .sticky-note .big { font-family: var(--font-serif); font-size: 2.1rem; line-height: 1.05; letter-spacing: -0.03em; margin: 12px 0; }
+    .sticky-note p { color: var(--muted); font-size: 0.82rem; }
+    [data-theme="dark"] .sticky-note p { color: var(--muted); }
+    .sticky-note .tag { color: var(--accent-3); font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.14em; }
+    .table-wrap {
+      overflow-x: auto; border: 1px solid var(--line); border-radius: 18px;
+      background: var(--surface); box-shadow: var(--shadow-soft);
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; font-size: 0.88rem; }
+    caption { text-align: left; padding: 16px 18px 0; color: var(--muted); font-size: 0.78rem; }
+    th {
+      padding: 13px 15px; text-align: left; background: var(--surface-2);
+      color: var(--muted); font-size: 0.65rem; letter-spacing: 0.11em; text-transform: uppercase;
+      border-bottom: 1px solid var(--line); white-space: nowrap;
+    }
+    td { padding: 13px 15px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    tr:last-child td { border-bottom: 0; }
+    tr.honest { background: var(--accent-soft); }
+    td.num { font-family: var(--font-mono); font-size: 0.82rem; text-align: right; white-space: nowrap; }
+    td.num strong { font-weight: 750; }
+    .family { font-weight: 750; white-space: nowrap; }
+    .pill {
+      display: inline-block; padding: 3px 9px; border-radius: 999px;
+      font-size: 0.68rem; font-weight: 800; white-space: nowrap;
+    }
+    .pill.good { background: var(--accent-soft); color: var(--accent); }
+    .pill.warn { background: #fbeadb; color: #a95512; }
+    .pill.bad { background: var(--danger-soft); color: var(--danger); }
+    [data-theme="dark"] .pill.warn { background: #3a2516; color: #f2a25c; }
+    .chart-card { padding: 26px 28px; }
+    .chart-scale { color: var(--muted); font-size: 0.68rem; margin: 0 0 12px; }
+    .chart-row {
+      display: grid; grid-template-columns: 140px minmax(0, 1fr) 54px;
+      gap: 14px; align-items: center; margin: 12px 0;
+    }
+    .chart-row span:first-child { font-size: 0.78rem; font-weight: 650; }
+    .chart-track { height: 10px; border-radius: 999px; background: var(--track); overflow: hidden; }
+    .chart-fill {
+      height: 100%; width: 0; border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #6fe0b8);
+      animation: grow 1.15s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    }
+    .chart-fill.hot { background: linear-gradient(90deg, var(--accent-2), #f2a25c); }
+    .chart-fill.dim { background: linear-gradient(90deg, #6d7f77, #9baba2); }
+    .chart-row b { font-family: var(--font-mono); font-size: 0.78rem; text-align: right; }
+    .figure {
+      margin: 0; background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-soft);
+    }
+    .figure img { width: 100%; height: auto; border-radius: 10px; background: #fff; }
+    .figure figcaption { color: var(--muted); font-size: 0.76rem; line-height: 1.5; padding: 12px 4px 2px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+    .tab {
+      border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+      padding: 9px 14px; border-radius: 999px; cursor: pointer; font-size: 0.8rem; font-weight: 750;
+    }
+    .tab:hover { border-color: var(--line-strong); color: var(--ink); }
+    .tab[aria-selected="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .leak-panel {
+      display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 30px;
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 30px; box-shadow: var(--shadow-soft);
+    }
+    .leak-panel h3 { font-family: var(--font-serif); font-size: 2rem; font-weight: 500; line-height: 1.05; letter-spacing: -0.03em; margin: 0 0 8px; }
+    .leak-panel .tag { color: var(--accent-2); font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+    .leak-panel p { color: var(--muted); font-size: 0.92rem; margin: 12px 0 0; }
+    .leak-panel .quote {
+      margin-top: 18px; padding: 16px 18px; border-left: 3px solid var(--accent-2);
+      background: var(--surface-2); border-radius: 0 12px 12px 0; color: var(--ink); font-size: 0.88rem;
+    }
+    .metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .metric {
+      padding: 15px; border: 1px solid var(--line); border-radius: 14px;
+      background: var(--surface-2);
+    }
+    .metric span { display: block; color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .metric b { display: block; font-family: var(--font-mono); font-size: 1.15rem; margin-top: 6px; }
+    .metric small { display: block; color: var(--muted); font-size: 0.68rem; margin-top: 4px; }
+    .metric.wide { grid-column: 1 / -1; }
+    .learning-path { display: grid; gap: 12px; counter-reset: step; }
+    .step {
+      display: grid; grid-template-columns: 44px 1fr; gap: 16px;
+      padding: 20px 22px; background: var(--surface); border: 1px solid var(--line);
+      border-radius: 16px; box-shadow: var(--shadow-soft);
+    }
+    .step-no {
+      width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px;
+      background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono);
+      font-size: 0.78rem; font-weight: 800;
+    }
+    .step h3 { margin: 2px 0 5px; font-size: 1rem; }
+    .step p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+    .step b { color: var(--ink); }
+    .glossary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; margin-top: 6px; }
+    .glossary div { padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .glossary dt { font-weight: 800; font-size: 0.87rem; }
+    .glossary dd { margin: 3px 0 0; color: var(--muted); font-size: 0.82rem; }
+    .quote-band {
+      margin-top: 34px; padding: 30px 34px; border-radius: var(--radius);
+      background: var(--ink); color: var(--paper); box-shadow: var(--shadow);
+    }
+    [data-theme="dark"] .quote-band { background: #0b211b; border: 1px solid var(--line); }
+    .quote-band p { margin: 0; font-family: var(--font-serif); font-size: clamp(1.5rem, 3vw, 2.25rem); line-height: 1.2; letter-spacing: -0.025em; }
+    .quote-band small { display: block; margin-top: 14px; color: var(--muted); font-size: 0.75rem; }
+    [data-theme="dark"] .quote-band small { color: var(--muted); }
+    .quiz-shell {
+      max-width: 880px; margin: 0 auto; padding: 32px;
+      background: var(--surface); border: 1px solid var(--line); border-radius: 26px;
+      box-shadow: var(--shadow); color: var(--ink);
+    }
+    .quiz-meta { display: flex; justify-content: space-between; gap: 18px; align-items: baseline; color: var(--muted); font-size: 0.72rem; }
+    .quiz-meta b { color: var(--accent); font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .quiz-progress { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; margin: 12px 0 26px; }
+    .quiz-progress span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 220ms ease; }
+    .quiz-question { margin: 0 0 18px; font-family: var(--font-serif); font-size: clamp(1.35rem, 2.8vw, 1.9rem); line-height: 1.2; letter-spacing: -0.02em; }
+    .quiz-options { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; }
+    .quiz-option {
+      display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px;
+      border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2);
+      cursor: pointer; font-size: 0.9rem; line-height: 1.45;
+    }
+    .quiz-option:hover { border-color: var(--line-strong); }
+    .quiz-option input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); flex: 0 0 auto; }
+    .quiz-option .letter {
+      width: 22px; height: 22px; display: grid; place-items: center; flex: 0 0 auto;
+      border-radius: 7px; background: var(--surface); border: 1px solid var(--line);
+      font-family: var(--font-mono); font-size: 0.66rem; font-weight: 800;
+    }
+    .quiz-option.correct { border-color: var(--accent); background: var(--accent-soft); }
+    .quiz-option.wrong { border-color: var(--danger); background: var(--danger-soft); }
+    .quiz-option.correct .letter { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+    .quiz-option.wrong .letter { background: var(--danger); color: var(--paper); border-color: var(--danger); }
+    .quiz-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .feedback {
+      margin-top: 18px; padding: 16px 18px; border-radius: 14px;
+      border: 1px solid var(--line); background: var(--surface-2); font-size: 0.9rem;
+    }
+    .feedback.good { border-color: color-mix(in srgb, var(--accent) 38%, var(--line)); background: var(--accent-soft); }
+    .feedback.bad { border-color: color-mix(in srgb, var(--danger) 38%, var(--line)); background: var(--danger-soft); }
+    .feedback b { display: block; margin-bottom: 4px; }
+    .result { text-align: center; padding: 20px 0 8px; }
+    .result .score { font-family: var(--font-mono); font-size: clamp(3rem, 8vw, 5rem); line-height: 1; color: var(--accent); letter-spacing: -0.05em; }
+    .result h3 { font-family: var(--font-serif); font-size: 2rem; font-weight: 500; margin: 10px 0 6px; }
+    .result p { max-width: 560px; margin: 0 auto; color: var(--muted); }
+    .result .missed { margin: 18px auto 0; max-width: 560px; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); text-align: left; font-size: 0.84rem; color: var(--muted); }
+    .result .missed b { color: var(--ink); }
+    .checklist { display: grid; gap: 9px; }
+    .check-item {
+      display: flex; gap: 12px; align-items: flex-start; padding: 13px 15px;
+      border: 1px solid var(--line); border-radius: 13px; background: var(--surface);
+      cursor: pointer; font-size: 0.88rem; line-height: 1.45;
+    }
+    .check-item:hover { border-color: var(--line-strong); }
+    .check-item input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); flex: 0 0 auto; }
+    .check-score { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 18px 0 12px; }
+    .check-score b { font-family: var(--font-mono); font-size: 1.6rem; }
+    .check-score span { color: var(--muted); font-size: 0.8rem; }
+    .score-track { height: 10px; border-radius: 999px; background: var(--track); overflow: hidden; }
+    .score-track i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-3)); transition: width 220ms ease; }
+    .score-message { min-height: 48px; margin: 14px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .slider-shell { margin-top: 24px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+    .slider-shell label { display: flex; justify-content: space-between; gap: 18px; font-size: 0.85rem; font-weight: 700; }
+    .slider-shell output { color: var(--accent); font-family: var(--font-mono); }
+    input[type="range"] { width: 100%; margin: 18px 0 10px; accent-color: var(--accent); }
+    .slider-shell p { margin: 0; color: var(--muted); font-size: 0.8rem; }
+    .slider-shell p b { color: var(--ink); }
+    .code {
+      position: relative; margin: 0; padding: 22px 20px; overflow-x: auto;
+      border-radius: 16px; background: #071b16; color: #d7e7de;
+      font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.85;
+      border: 1px solid #1d3c32; max-width: 100%;
+    }
+    .code .c { color: #7f9a8f; }
+    .code .g { color: #8be9c3; }
+    .code .y { color: #d9f36a; }
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px; border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06); color: #d7e7de; border-radius: 999px;
+      padding: 5px 10px; font-size: 0.65rem; cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.12); }
+    .trust-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 28px; margin: 0; padding: 0; list-style: none; }
+    .trust-list li { position: relative; padding: 10px 0 10px 28px; border-bottom: 1px solid var(--line); font-size: 0.88rem; color: var(--muted); }
+    .trust-list li::before {
+      content: "✓"; position: absolute; left: 0; top: 10px; width: 18px; height: 18px;
+      display: grid; place-items: center; border-radius: 50%; background: var(--accent-soft);
+      color: var(--accent); font-size: 0.68rem; font-weight: 900;
+    }
+    .trust-list b { color: var(--ink); }
+    .faq { border-top: 1px solid var(--line); }
+    .faq details { border-bottom: 1px solid var(--line); padding: 17px 0; }
+    .faq summary {
+      display: flex; justify-content: space-between; gap: 20px; cursor: pointer;
+      list-style: none; font-weight: 750; font-size: 0.94rem;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; color: var(--accent); font-family: var(--font-mono); font-size: 1.05rem; line-height: 1; }
+    .faq details[open] summary::after { content: "−"; }
+    .faq details p { margin: 12px 0 0; color: var(--muted); font-size: 0.87rem; max-width: 840px; }
+    .site-footer { background: #071b16; color: #b9c9c1; padding: 52px 0 28px; }
+    .footer-grid { display: grid; grid-template-columns: 1.4fr 0.8fr 0.8fr; gap: 38px; }
+    .footer-brand { display: flex; align-items: center; gap: 12px; color: #fff; font-weight: 800; }
+    .footer-brand img { width: 38px; height: 38px; border-radius: 11px; }
+    .footer-copy p { max-width: 430px; color: #8ea69c; font-size: 0.82rem; }
+    .footer-col h4 { color: #fff; font-size: 0.7rem; letter-spacing: 0.13em; text-transform: uppercase; margin: 0 0 12px; }
+    .footer-col a { display: block; color: #b9c9c1; text-decoration: none; font-size: 0.8rem; padding: 4px 0; }
+    .footer-col a:hover { color: var(--accent-3); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+      margin-top: 38px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.12);
+      color: #7f9a8f; font-size: 0.7rem;
+    }
+    .reveal { opacity: 1; transform: none; }
+    .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity 560ms ease, transform 560ms ease; }
+    .js .reveal.in { opacity: 1; transform: none; }
+    .js .stagger > * { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease, transform 500ms ease; }
+    .js .stagger.in > * { opacity: 1; transform: none; }
+    .js .stagger.in > *:nth-child(2) { transition-delay: 60ms; }
+    .js .stagger.in > *:nth-child(3) { transition-delay: 120ms; }
+    .js .stagger.in > *:nth-child(4) { transition-delay: 180ms; }
+    .js .stagger.in > *:nth-child(5) { transition-delay: 240ms; }
+    .js .stagger.in > *:nth-child(6) { transition-delay: 300ms; }
+    [hidden] { display: none !important; }
+    @media (max-width: 1080px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+      .hero-visual { max-width: 680px; }
+      .hero-card { margin-left: 0; }
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split { grid-template-columns: 1fr; }
+      .sticky-note { position: static; }
+    }
+    @media (max-width: 900px) {
+      .site-nav {
+        display: none; position: absolute; left: 20px; right: 20px; top: 62px;
+        flex-direction: column; align-items: stretch; gap: 4px; padding: 12px;
+        background: #0a211a; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      }
+      .site-nav a { padding: 11px 12px; }
+      .nav-open .site-nav { display: flex; }
+      .nav-toggle { display: grid; }
+      .header-actions .nav-cta { display: none; }
+      .leak-panel { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .section { padding: 72px 0; }
+      .section-head { grid-template-columns: 1fr; gap: 6px; }
+      .section-no { padding-top: 0; }
+    }
+    @media (max-width: 720px) {
+      .wrap { width: calc(100% - 28px); }
+      .hero { padding: 52px 0 56px; }
+      h1 { font-size: clamp(3.1rem, 15vw, 5rem); }
+      .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+      .hero-stat { padding-left: 11px; }
+      .terminal pre { font-size: 0.69rem; padding: 17px; }
+      .terminal-note { padding-inline: 17px; font-size: 0.6rem; }
+      .grid-2, .grid-3, .grid-4, .trust-list, .glossary { grid-template-columns: 1fr; }
+      .chart-row { grid-template-columns: 112px minmax(0, 1fr) 48px; gap: 9px; }
+      .chart-row span:first-child { font-size: 0.7rem; }
+      .quiz-shell { padding: 22px 18px; }
+      .quiz-meta { flex-direction: column; gap: 4px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      .callout { grid-template-columns: 1fr; }
+      .quote-band { padding: 24px; }
+      .section { padding: 62px 0; }
+      .ticker { font-size: 0.62rem; }
+      .ticker-track { justify-content: flex-start; gap: 8px 18px; padding-inline: 14px; }
+    }
+    @media (max-width: 360px) {
+      .brand small { display: none; }
+      .header-inner { gap: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+  <header class="site-header" id="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="FakeAlpha Benchmark home">
+        <img src="assets/logo.svg" alt="" width="34" height="34">
+        <span>FakeAlpha<small>Backtest integrity benchmark</small></span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a href="#brief">The brief</a>
+        <a href="#leaks">Leak library</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#beginner">Beginner guide</a>
+        <a href="#quiz">Quiz</a>
+        <a href="#reproduce">Reproduce</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" hidden><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 7 7 0 1 0 20 14.5Z"/></svg>
+        </button>
+        <a class="nav-cta" href="#quiz">Test yourself <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">Paired live-market benchmark · v0.1</p>
+          <h1>Leakage looks<br><em>like alpha.</em></h1>
+          <p class="lede">A backtest can look brilliant because it cheated, not because it works. FakeAlpha is a <strong>paired, live-market benchmark</strong> that shows how six common leaks inflate performance, which diagnostics catch them, and which ones wave them through.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#evidence">See the evidence <span aria-hidden="true">↓</span></a>
+            <a class="btn btn-ghost" href="#beginner">Start from zero <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="hero-stats" aria-label="Benchmark at a glance">
+            <div class="hero-stat"><b>560</b><span>paired family-runs</span></div>
+            <div class="hero-stat"><b>6</b><span>leak families</span></div>
+            <div class="hero-stat"><b>12</b><span>live US ETFs</span></div>
+            <div class="hero-stat"><b>20</b><span>tests passing</span></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="terminal">
+            <div class="terminal-bar" aria-hidden="true"><i></i><i></i><i></i><span>fakealpha · reproduce</span></div>
+            <pre><span class="t-dim">$</span> fakealpha reproduce
+<span class="t-ok">✓</span> data manifest verified
+<span class="t-ok">✓</span> 80 paired replicates
+<span class="t-ok">✓</span> 560 family-runs
+<span class="t-ok">✓</span> 21 tests passed
+
+<span class="t-key">honest Sharpe</span>       0.821
+<span class="t-key">highest leak</span>      6.842
+<span class="t-warn">composite FPR</span>     3.8%
+<span class="t-warn">audit FPR</span>         0.0%</pre>
+            <div class="terminal-note"><span>Live data to 23 Oct 2026</span><span>seed 20261025</span></div>
+          </div>
+          <div class="hero-card" aria-label="Mean annualized Sharpe ratio by family">
+            <div class="hero-card-head"><b>Mean annualized Sharpe</b><span>7 families</span></div>
+            <div class="mini-row"><span>Honest</span><div class="mini-track"><i style="--w:12%"></i></div><b>0.82</b></div>
+            <div class="mini-row"><span>Full-sample</span><div class="mini-track"><i style="--w:14.3%"></i></div><b>0.98</b></div>
+            <div class="mini-row"><span>Shuffled CV</span><div class="mini-track"><i style="--w:14.5%"></i></div><b>0.99</b></div>
+            <div class="mini-row"><span>Survivorship</span><div class="mini-track"><i style="--w:17.5%"></i></div><b>1.20</b></div>
+            <div class="mini-row"><span>Target leak</span><div class="mini-track"><i class="hot" style="--w:100%"></i></div><b>6.84</b></div>
+            <p class="mini-note">The target-feature leak is 8.3× the honest Sharpe. The audit catches it 100% of the time; DSR does not.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-label="Benchmark facts">
+      <div class="wrap ticker-track">
+        <span>12 liquid US ETFs</span><span>4,984 panel rows</span><span>3,520 evaluation rows</span><span>128 candidates</span><span>40 sampled per replicate</span><span>80 paired replicates</span><span>5 diagnostics + audit</span>
+      </div>
+    </div>
+
+    <section class="section" id="brief">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">01 / BRIEF</div>
+          <div>
+            <h2>The one-minute version.</h2>
+            <p>If you only read one screen, read this. The rest of the page shows the evidence, the mechanics, and how to use it.</p>
+          </div>
+        </div>
+        <div class="grid-4 stagger">
+          <article class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/></svg></div>
+            <span class="card-kicker">The problem</span>
+            <h3>A backtest can see the future.</h3>
+            <p>A timing mistake, a leaky feature, or a winner picked after the test can turn hindsight into what looks like skill.</p>
+          </article>
+          <article class="card">
+            <div class="icon warm" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v5l-4 7a4 4 0 0 0 3.5 6h5a4 4 0 0 0 3.5-6l-4-7V3"/><path d="M8 15h8"/></svg></div>
+            <span class="card-kicker">The test</span>
+            <h3>Run both pipelines. Change only the leak.</h3>
+            <p>Same ETFs, same dates, same candidates, same seed. Eighty paired replicates per contamination family.</p>
+          </article>
+          <article class="card">
+            <div class="icon lime" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></div>
+            <span class="card-kicker">The surprise</span>
+            <h3>Leakage lifts Sharpe. The usual screens still publish it.</h3>
+            <p>Mean Sharpe rises from 0.821 to 6.842. The deflated Sharpe ratio catches 0% of the leaks; the nominal reality check publishes 98.8–100%.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <span class="card-kicker">The fix</span>
+            <h3>Triage with returns. Verify with a re-run.</h3>
+            <p>A returns-only composite catches five of six families at a 3.8% false-positive rate. A clean re-execution audit checks the implementation.</p>
+          </article>
+        </div>
+        <div class="callout reveal">
+          <div class="callout-mark" aria-hidden="true">!</div>
+          <p><strong>Bottom line:</strong> no returns-only statistic proves a backtest is valid. Extreme performance is a reason to audit the pipeline, not a substitute for one.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="value">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">02 / VALUE</div>
+          <div>
+            <h2>A high Sharpe is a claim.<br>Diligence is the evidence.</h2>
+            <p>FakeAlpha gives investment, research, and risk teams a shared language for the uncomfortable question: <strong>would this result survive a clean re-run?</strong></p>
+          </div>
+        </div>
+        <div class="split">
+          <div class="grid-2 stagger">
+            <article class="card">
+              <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></div>
+              <span class="card-kicker">Before you allocate</span>
+              <h3>Ask for a clean re-run.</h3>
+              <p>Use the benchmark and the eight-question checklist to separate a reproducible result from a story about one.</p>
+            </article>
+            <article class="card">
+              <div class="icon warm" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="M8 15V9M12 15V6M16 15v-3"/></svg></div>
+              <span class="card-kicker">Before you publish</span>
+              <h3>Catch leakage before the committee does.</h3>
+              <p>Six deliberately constructed leaks show what inflated performance looks like when the mechanism is known.</p>
+            </article>
+            <article class="card">
+              <div class="icon lime" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5M8 17h3"/></svg></div>
+              <span class="card-kicker">Before you ship a model</span>
+              <h3>Document lineage, selection, and limits.</h3>
+              <p>The data card, model card, protocol, manifest, and run record make model-risk conversations concrete.</p>
+            </article>
+            <article class="card">
+              <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="m2 12 10 5 10-5M2 16l10 5 10-5"/></svg></div>
+              <span class="card-kicker">Before you teach</span>
+              <h3>Make the abstract concrete.</h3>
+              <p>The quiz, figures, and controlled families turn “data leakage” from a definition into something a learner can see.</p>
+            </article>
+          </div>
+          <aside class="sticky-note reveal">
+            <div class="tag">The uncomfortable number</div>
+            <div class="big">3.8%</div>
+            <p>is the composite’s empirical false-positive rate: 3 of 80 honest runs flagged. That is the price of triage. The audit’s 0% is not a free lunch; it is a deterministic construction.</p>
+            <div class="tag" style="margin-top:22px">In one sentence</div>
+            <p style="color:#d7e7de;font-size:0.95rem;line-height:1.55">A track record is a claim about a pipeline. The pipeline is what you diligence.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="audience">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">03 / USE CASES</div>
+          <div>
+            <h2>Who gets value from this?</h2>
+            <p>You do not need to be a quant to use the benchmark. You need a decision that depends on a historical result.</p>
+          </div>
+        </div>
+        <div class="grid-3 stagger">
+          <article class="card">
+            <span class="card-kicker">Investment teams</span>
+            <h3>Allocators and investment committees</h3>
+            <p>Put a manager’s backtest through a reproducible checklist before it becomes an allocation. Ask what the universe, the selection rule, and the re-run actually prove.</p>
+          </article>
+          <article class="card">
+            <span class="card-kicker">Research</span>
+            <h3>Quant researchers and modelers</h3>
+            <p>Use six controlled leak families as a test bed for new diagnostics. Add a gate and see whether it catches the leak without raising false positives.</p>
+          </article>
+          <article class="card">
+            <span class="card-kicker">Data science</span>
+            <h3>Data scientists and ML engineers</h3>
+            <p>Learn time-series validation on a real panel: walk-forward, embargoes, nested selection, target leakage, and why shuffled CV is a trap.</p>
+          </article>
+          <article class="card">
+            <span class="card-kicker">Risk &amp; audit</span>
+            <h3>Model risk and internal audit</h3>
+            <p>See a paired audit, its power curve, and its limits. A non-significant audit is not a clean bill of health; the benchmark shows why.</p>
+          </article>
+          <article class="card">
+            <span class="card-kicker">Education</span>
+            <h3>Teachers, students, and interview candidates</h3>
+            <p>Start with the plain-English guide, take the twelve-question quiz, then read the code. You will understand more than most interview candidates.</p>
+          </article>
+          <article class="card">
+            <span class="card-kicker">Builders</span>
+            <h3>Toolmakers and platform teams</h3>
+            <p>Fork the harness, add a leak family or diagnostic, or run the same protocol on a different universe. MIT licensed and Docker-ready.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="leaks">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">04 / LEAK LIBRARY</div>
+          <div>
+            <h2>Six ways a backtest lies.</h2>
+            <p>Each family changes one thing that a real researcher could get wrong. The point is not that every backtest is fraudulent. The point is that a high number cannot tell you which mechanism produced it.</p>
+          </div>
+        </div>
+        <div class="tabs reveal" role="tablist" aria-label="Contamination families">
+          <button class="tab" type="button" role="tab" id="tab-same" aria-selected="true" aria-controls="leak-panel" data-leak="same">Same-bar fill</button>
+          <button class="tab" type="button" role="tab" id="tab-target" aria-selected="false" aria-controls="leak-panel" data-leak="target" tabindex="-1">Target feature</button>
+          <button class="tab" type="button" role="tab" id="tab-full" aria-selected="false" aria-controls="leak-panel" data-leak="full" tabindex="-1">Full-sample encoding</button>
+          <button class="tab" type="button" role="tab" id="tab-shuffle" aria-selected="false" aria-controls="leak-panel" data-leak="shuffle" tabindex="-1">Shuffled CV</button>
+          <button class="tab" type="button" role="tab" id="tab-survivor" aria-selected="false" aria-controls="leak-panel" data-leak="survivor" tabindex="-1">Survivorship</button>
+          <button class="tab" type="button" role="tab" id="tab-phack" aria-selected="false" aria-controls="leak-panel" data-leak="phack" tabindex="-1">P-hacked selection</button>
+        </div>
+        <div class="leak-panel reveal" id="leak-panel" role="tabpanel" aria-labelledby="tab-same" tabindex="0">
+          <div>
+            <div class="tag" id="leak-tag">Timing</div>
+            <h3 id="leak-title">Same-bar fill</h3>
+            <p id="leak-what"></p>
+            <div class="quote" id="leak-quote"></div>
+          </div>
+          <div>
+            <div class="metric-grid">
+              <div class="metric"><span>Mean Sharpe</span><b id="leak-sr"></b><small>honest: 0.821</small></div>
+              <div class="metric"><span>Sharpe lift</span><b id="leak-lift"></b><small>vs honest control</small></div>
+              <div class="metric"><span>Composite detects</span><b id="leak-composite"></b><small>at 3.8% FPR</small></div>
+              <div class="metric"><span>Audit detects</span><b id="leak-audit"></b><small>at 5% level</small></div>
+              <div class="metric wide"><span>Why it matters</span><small id="leak-why" style="font-size:0.82rem;line-height:1.55;color:var(--muted);margin-top:2px"></small></div>
+            </div>
+          </div>
+        </div>
+        <div class="callout reveal">
+          <div class="callout-mark" aria-hidden="true">i</div>
+          <p><strong>Read the pattern, not just the ranking.</strong> The largest Sharpe lift is the easiest to detect. The small full-sample leak adds only +0.159 Sharpe and is the hardest for the audit to catch. That is why a single “caught / not caught” label is not enough.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="evidence">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">05 / EVIDENCE</div>
+          <div>
+            <h2>What 560 paired runs show.</h2>
+            <p>All numbers below come from the committed result tables in <code>results/tables/</code>. Detection is measured at thresholds calibrated to the honest control’s 95th percentile.</p>
+          </div>
+        </div>
+        <div class="table-wrap reveal">
+          <table>
+            <caption>Mean annualized Sharpe and detection rates by family. “Composite” and “audit” are the two practical screens; the audit’s 0% FPR is by construction, not an empirical estimate.</caption>
+            <thead>
+              <tr><th scope="col">Family</th><th scope="col" style="text-align:right">Mean Sharpe</th><th scope="col" style="text-align:right">Lift</th><th scope="col">Composite</th><th scope="col">Audit</th><th scope="col">Plain meaning</th></tr>
+            </thead>
+            <tbody>
+              <tr class="honest"><td class="family">Honest control</td><td class="num">0.821</td><td class="num">—</td><td><span class="pill good">3.8% FPR</span></td><td><span class="pill good">0.0% FPR</span></td><td>No leak; the baseline.</td></tr>
+              <tr><td class="family">Same-bar fill</td><td class="num">2.048</td><td class="num">+1.227</td><td><span class="pill good">100%</span></td><td><span class="pill good">100%</span></td><td>Trade today’s return at today’s close.</td></tr>
+              <tr><td class="family">Target feature</td><td class="num"><strong>6.842</strong></td><td class="num"><strong>+6.021</strong></td><td><span class="pill good">100%</span></td><td><span class="pill good">100%</span></td><td>Use next week’s return as a feature.</td></tr>
+              <tr><td class="family">Full-sample encoding</td><td class="num">0.980</td><td class="num">+0.159</td><td><span class="pill good">100%</span></td><td><span class="pill bad">3.8%</span></td><td>Pick assets by their full-history return.</td></tr>
+              <tr><td class="family">Shuffled CV</td><td class="num">0.990</td><td class="num">+0.169</td><td><span class="pill warn">55.0%</span></td><td><span class="pill warn">35.0%</span></td><td>Shuffle time before validation.</td></tr>
+              <tr><td class="family">Survivorship</td><td class="num">1.198</td><td class="num">+0.377</td><td><span class="pill good">100%</span></td><td><span class="pill warn">67.5%</span></td><td>Keep only the funds alive today.</td></tr>
+              <tr><td class="family">P-hacked selection</td><td class="num">1.477</td><td class="num">+0.656</td><td><span class="pill good">100%</span></td><td><span class="pill good">96.3%</span></td><td>Report the best test-year variant.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="grid-2" style="margin-top:22px">
+          <div class="card chart-card reveal">
+            <span class="card-kicker">Mean annualized Sharpe</span>
+            <p class="chart-scale" style="margin-top:8px">Scale: 0 to 6.84. The honest control is the short gray bar.</p>
+            <div class="chart-row"><span>Honest</span><div class="chart-track"><i class="chart-fill dim" style="--w:12%"></i></div><b>0.82</b></div>
+            <div class="chart-row"><span>Full-sample</span><div class="chart-track"><i class="chart-fill" style="--w:14.3%"></i></div><b>0.98</b></div>
+            <div class="chart-row"><span>Shuffled CV</span><div class="chart-track"><i class="chart-fill" style="--w:14.5%"></i></div><b>0.99</b></div>
+            <div class="chart-row"><span>Survivorship</span><div class="chart-track"><i class="chart-fill" style="--w:17.5%"></i></div><b>1.20</b></div>
+            <div class="chart-row"><span>P-hacked</span><div class="chart-track"><i class="chart-fill hot" style="--w:21.6%"></i></div><b>1.48</b></div>
+            <div class="chart-row"><span>Same-bar</span><div class="chart-track"><i class="chart-fill hot" style="--w:29.9%"></i></div><b>2.05</b></div>
+            <div class="chart-row"><span>Target leak</span><div class="chart-track"><i class="chart-fill hot" style="--w:100%"></i></div><b>6.84</b></div>
+          </div>
+          <figure class="figure reveal">
+            <img src="results/figures/inflation_vs_detection.png" alt="Scatter plot of mean Sharpe inflation versus detection rate for the composite screen and the artifact audit." width="1224" height="792" loading="lazy">
+            <figcaption>Detection power rises with the size of the leak. The audit is stronger on large implementation leaks; the composite is stronger on the small full-sample leak. Neither is a universal detector.</figcaption>
+          </figure>
+        </div>
+        <div class="callout reveal">
+          <div class="callout-mark" aria-hidden="true">!</div>
+          <p><strong>The scariest row is the small leak.</strong> Full-sample encoding adds +0.159 Sharpe, yet the audit flags it in only 3 of 80 runs. A non-significant audit is not a clean bill of health; it may simply lack power.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="how">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">06 / METHOD</div>
+          <div>
+            <h2>One pipeline. Six controlled failures.</h2>
+            <p>The design is deliberately boring: hold everything constant, change one mechanism, and measure what the diagnostics can see.</p>
+          </div>
+        </div>
+        <figure class="figure reveal" style="padding:12px;margin-bottom:22px">
+          <img src="assets/pipeline.svg" alt="Pipeline: live ETF data, causal features, a 128-strategy candidate pool, an honest walk-forward run, six paired leak families, and five diagnostics plus an audit." width="1200" height="330" loading="lazy">
+          <figcaption>Live data enters a causal feature pipeline and a candidate pool. The honest walk-forward run is paired with six contaminated versions; only the leak changes.</figcaption>
+        </figure>
+        <div class="grid-3 stagger">
+          <article class="card">
+            <span class="card-kicker">Paired by design</span>
+            <h3>Same data. Same seed. Same candidates.</h3>
+            <p>Each contaminated run is compared with an honest run on the same 40-candidate subset and the same dates. The difference is the leak, not a new universe or a lucky seed.</p>
+          </article>
+          <article class="card">
+            <span class="card-kicker">Calibrated, not arbitrary</span>
+            <h3>Thresholds come from honest controls.</h3>
+            <p>Every gate is set at the 95th percentile of the honest suspicion score. The observed false-positive rate is reported, including the discrete 3/80 result.</p>
+          </article>
+          <article class="card">
+            <span class="card-kicker">Audited, not assumed</span>
+            <h3>Re-execute the clean pipeline.</h3>
+            <p>The artifact audit reruns the honest pipeline and bootstraps the Sharpe difference with a paired circular block bootstrap. It observes implementation, not just returns.</p>
+          </article>
+        </div>
+        <div class="callout reveal">
+          <div class="callout-mark" aria-hidden="true">?</div>
+          <p><strong>Why 80 replicates?</strong> A single run is a coin flip. Repeated paired runs turn a single result into a rate with a confidence interval. The benchmark reports Wilson intervals and the full replicate table, not just a headline.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="beginner">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">07 / START HERE</div>
+          <div>
+            <h2>🌱 Beginner guide — read this and you are a professional.</h2>
+            <p>No finance degree required. If you can read a weather forecast, you can understand a backtest. This section builds the idea from the ground up; the quiz below checks it.</p>
+          </div>
+        </div>
+        <div class="grid-2 stagger">
+          <article class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></svg></div>
+            <span class="card-kicker">The analogy</span>
+            <h3>A backtest is a replay.</h3>
+            <p>Imagine replaying last season’s football games with today’s playbook. That is a backtest: a rule applied to old data. It is useful only if the playbook could not see the final score.</p>
+          </article>
+          <article class="card">
+            <div class="icon warm" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/><path d="m4 4 16 16"/></svg></div>
+            <span class="card-kicker">The leak</span>
+            <h3>Leakage is hindsight.</h3>
+            <p>If the playbook knows the final score, the replay looks brilliant. In data terms: a feature contains next week’s return, a trade uses today’s close, or the winner is chosen after the test.</p>
+          </article>
+          <article class="card">
+            <div class="icon lime" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M6 20v-4M18 20V4"/></svg></div>
+            <span class="card-kicker">The score</span>
+            <h3>Sharpe is return per unit of wobble.</h3>
+            <p>A higher Sharpe means a smoother ride for the same return. It is a useful summary, but it is not proof that the strategy was allowed to know what it knew.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <span class="card-kicker">The habit</span>
+            <h3>Reproduce before you trust.</h3>
+            <p>A track record is a claim about a pipeline. The cheapest way to test the claim is to rerun the pipeline with the same data and compare the result.</p>
+          </article>
+        </div>
+
+        <div class="grid-2" style="margin-top:26px">
+          <div class="reveal">
+            <div class="card-kicker" style="margin-bottom:12px">The five-minute path</div>
+            <div class="learning-path">
+              <div class="step"><div class="step-no">1</div><div><h3>Learn the four nouns</h3><p><b>Data</b> is the past. <b>Signal</b> is the rule. <b>Backtest</b> is the replay. <b>Sharpe</b> is the score.</p></div></div>
+              <div class="step"><div class="step-no">2</div><div><h3>Ask what the rule knew</h3><p>At the moment of each decision, was every input actually available? If not, you have a timing or feature leak.</p></div></div>
+              <div class="step"><div class="step-no">3</div><div><h3>Ask how the winner was chosen</h3><p>If the test years helped pick the winner, the reported score is selected, not out-of-sample.</p></div></div>
+              <div class="step"><div class="step-no">4</div><div><h3>Ask what the screen can see</h3><p>DSR and the reality check see returns and trials. PBO sees the candidate matrix. The audit sees the implementation.</p></div></div>
+              <div class="step"><div class="step-no">5</div><div><h3>Re-run before you believe</h3><p>Use the checklist, then a clean re-execution. A non-significant audit is not proof; it may be low power.</p></div></div>
+            </div>
+          </div>
+          <div class="reveal">
+            <div class="card-kicker" style="margin-bottom:12px">Plain-English glossary</div>
+            <dl class="glossary">
+              <div><dt>Sharpe ratio</dt><dd>Return divided by volatility. Higher means smoother, not necessarily honest.</dd></div>
+              <div><dt>Leakage</dt><dd>Using information that was not available at the time of the decision.</dd></div>
+              <div><dt>Walk-forward</dt><dd>Train on the past, test on the next period, then move forward.</dd></div>
+              <div><dt>Deflated Sharpe (DSR)</dt><dd>A Sharpe adjusted for the number of tries. A publication filter, not a validity check.</dd></div>
+              <div><dt>PBO</dt><dd>The chance the in-sample winner is below the out-of-sample median.</dd></div>
+              <div><dt>Reality check</dt><dd>Asks whether the best result is surprising after many trials. It can reward a leak.</dd></div>
+              <div><dt>Split-half</dt><dd>Compares the first half of the test period with the second half. One-sided by design.</dd></div>
+              <div><dt>Artifact audit</dt><dd>Re-runs the honest pipeline and compares the reported return series.</dd></div>
+              <div><dt>False positive</dt><dd>An honest strategy flagged as suspicious. The composite’s rate is 3.8%.</dd></div>
+              <div><dt>P-hacking</dt><dd>Trying variants until one looks good on the test data, then reporting only that one.</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="quote-band reveal">
+          <p>“A high Sharpe is a question, not an answer.”</p>
+          <small>Work through this guide and the quiz, and you will understand more than most interview candidates.</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="quiz">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no" style="color:var(--accent-3)">08 / LEARN BY DOING</div>
+          <div>
+            <h2>Are you a leak detective?</h2>
+            <p>Twelve questions, from “what is a backtest?” to “why can a powerful audit still miss a small leak?” Instant explanations, no sign-up, no score saved.</p>
+          </div>
+        </div>
+        <div class="quiz-shell reveal">
+          <div class="quiz-meta"><b id="quiz-level">Foundation</b><span id="quiz-count">Question 1 of 12</span></div>
+          <div class="quiz-progress" aria-hidden="true"><span id="quiz-progress"></span></div>
+          <div id="quiz-stage">
+            <h3 class="quiz-question" id="quiz-question" tabindex="-1">Loading question…</h3>
+            <form id="quiz-form">
+              <fieldset class="quiz-options" id="quiz-options">
+                <legend class="sr-only">Choose one answer</legend>
+              </fieldset>
+              <div class="quiz-actions">
+                <button class="btn btn-dark" id="quiz-submit" type="submit">Check answer</button>
+              </div>
+            </form>
+            <div class="feedback" id="quiz-feedback" aria-live="polite" hidden></div>
+            <div class="quiz-actions" id="quiz-next-wrap" hidden>
+              <button class="btn btn-line" id="quiz-next" type="button">Next question <span aria-hidden="true">→</span></button>
+            </div>
+          </div>
+          <div class="result" id="quiz-result" hidden>
+            <div class="score" id="quiz-score">0 / 12</div>
+            <h3 id="quiz-tier">Tour complete</h3>
+            <p id="quiz-summary"></p>
+            <div class="missed" id="quiz-missed"></div>
+            <div class="quiz-actions" style="justify-content:center">
+              <button class="btn btn-dark" id="quiz-restart" type="button">Take it again</button>
+              <a class="btn btn-line" href="#beginner">Review the guide</a>
+            </div>
+          </div>
+        </div>
+        <noscript><p style="text-align:center;color:#b9c9c1;margin-top:18px">The quiz needs JavaScript. The same explanations are in the beginner guide above.</p></noscript>
+      </div>
+    </section>
+
+    <section class="section" id="checklist">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">09 / CHECKLIST</div>
+          <div>
+            <h2>Would your backtest survive a review?</h2>
+            <p>This is a self-assessment, not a certification. Check what is true today; the gaps are the conversation.</p>
+          </div>
+        </div>
+        <div class="split">
+          <div class="reveal">
+            <div class="checklist" id="checklist-items">
+              <label class="check-item"><input type="checkbox" data-check><span>We record a data manifest with hashes, row counts, and date ranges.</span></label>
+              <label class="check-item"><input type="checkbox" data-check><span>Selection is nested inside the evaluation window; the test years never choose the winner.</span></label>
+              <label class="check-item"><input type="checkbox" data-check><span>Time-series validation is ordered, with no shuffle and an explicit embargo or gap.</span></label>
+              <label class="check-item"><input type="checkbox" data-check><span>The universe is point-in-time, not “funds that are alive today.”</span></label>
+              <label class="check-item"><input type="checkbox" data-check><span>We count every variant we tried, not just the one we report.</span></label>
+              <label class="check-item"><input type="checkbox" data-check><span>We re-run the clean pipeline and compare the return series before publishing.</span></label>
+              <label class="check-item"><input type="checkbox" data-check><span>We report false positives and calibration, not just detection.</span></label>
+              <label class="check-item"><input type="checkbox" data-check><span>We document what the result does not prove and where it could fail.</span></label>
+            </div>
+            <div class="check-score"><span>Your hygiene score</span><b><span id="check-count">0</span>/8</b></div>
+            <div class="score-track" aria-hidden="true"><i id="check-bar"></i></div>
+            <p class="score-message" id="check-message" aria-live="polite">Check the items that are true. A perfect score is a starting point, not a guarantee.</p>
+            <div class="quiz-actions"><button class="btn btn-line" id="check-reset" type="button">Reset checklist</button></div>
+          </div>
+          <div class="reveal">
+            <div class="sticky-note" style="position:static">
+              <div class="tag">False-positive intuition</div>
+              <div class="big"><span id="fpr-count">4</span> in <span id="fpr-total">100</span></div>
+              <p style="color:#d7e7de">At the composite’s 3.8% false-positive rate, about this many honest strategies would be flagged. A false positive costs review time; a false negative can cost much more.</p>
+              <div class="slider-shell" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.14)">
+                <label for="fpr-range" style="color:#fff">Honest strategies tested <output id="fpr-output" for="fpr-range">100</output></label>
+                <input id="fpr-range" type="range" min="20" max="500" step="10" value="100">
+                <p style="color:#b9c9c1">Expected count, not a guarantee: <b id="fpr-expected" style="color:#d9f36a">3.8% × 100 ≈ 4</b>. This is the benchmark’s empirical calibration, not a universal rate.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="reproduce">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">10 / REPRODUCE</div>
+          <div>
+            <h2>From clone to evidence in three commands.</h2>
+            <p>The full run takes about 48 seconds on the development machine used for the paper, plus data-fetch time. The Docker path reproduces the committed summary byte for byte.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="reveal">
+            <div class="card-kicker" style="margin-bottom:10px">Local</div>
+            <pre class="code"><button class="copy-btn" type="button" data-copy="python3 -m venv .venv
+. .venv/bin/activate
+pip install -e &quot;.[dev]&quot; -c constraints.txt
+fakealpha fetch --config config/experiment.yaml
+fakealpha run --config config/experiment.yaml
+pytest -q
+ruff check src tests">Copy</button><span class="c"># Python 3.12</span>
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -e <span class="y">".[dev]"</span> -c constraints.txt
+
+<span class="c"># Live data is cached; --force refetches</span>
+fakealpha fetch --config config/experiment.yaml
+
+<span class="c"># 80 paired replicates</span>
+fakealpha run --config config/experiment.yaml
+
+pytest -q
+ruff check src tests</pre>
+          </div>
+          <div class="reveal">
+            <div class="card-kicker" style="margin-bottom:10px">Docker</div>
+            <pre class="code"><button class="copy-btn" type="button" data-copy="docker compose build
+docker compose run --rm fakealpha">Copy</button>docker compose build
+docker compose run --rm fakealpha
+
+<span class="c"># verified: summary.csv hash unchanged</span>
+<span class="g">6f44b24fb53b602f2fcc2d2a91e98948a4077f7ada9111334bc59bbe3723184c</span></pre>
+            <ul class="trust-list" style="margin-top:18px">
+              <li><b>Seed</b> 20261025</li>
+              <li><b>Replicates</b> 80</li>
+              <li><b>Family-runs</b> 560</li>
+              <li><b>Tests</b> 20 passing</li>
+              <li><b>Lint</b> ruff clean</li>
+              <li><b>License</b> MIT</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout reveal">
+          <div class="callout-mark" aria-hidden="true">✓</div>
+          <p><strong>What “reproduced” means here:</strong> the Docker run completed with exit 0 and regenerated <code>results/tables/summary.csv</code> with the same SHA-256 as the local run. The manifest records the data hashes, package versions, platform, and config.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="trust">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">11 / TRUST</div>
+          <div>
+            <h2>Strong claims need boring evidence.</h2>
+            <p>The project is designed to be checked. Every headline number has a table, a seed, a manifest, or a test behind it.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="reveal">
+            <ul class="trust-list">
+              <li><b>Live public data.</b> 12 liquid US ETFs, Yahoo chart data through 23 October 2026.</li>
+              <li><b>Data manifest.</b> SHA-256 per raw file, row counts, date ranges, and validation status.</li>
+              <li><b>Paired design.</b> 80 replicates per family; the honest and contaminated runs share the candidate subset and seed.</li>
+              <li><b>Calibrated gates.</b> Honest 95th-percentile thresholds; empirical false-positive rates reported.</li>
+              <li><b>Full artifacts.</b> Per-replicate table, summary, honest controls, thresholds, figures, and manifest.</li>
+              <li><b>Tests and lint.</b> 21 tests pass; ruff is clean.</li>
+              <li><b>Docker reproduction.</b> Byte-identical summary hash after a clean container run.</li>
+              <li><b>Open license.</b> MIT; fork it, audit it, extend it.</li>
+            </ul>
+          </div>
+          <div class="reveal">
+            <div class="sticky-note" style="position:static">
+              <div class="tag">What this is not</div>
+              <div class="big">Not a trading strategy.<br>Not a fraud detector.</div>
+              <p style="color:#d7e7de">It is a controlled benchmark for six known contamination mechanisms on one ETF universe and one test period. It does not estimate how common leakage is in the literature, prove intent, or certify a manager.</p>
+              <div class="tag" style="margin-top:22px">Read the limits</div>
+              <p style="color:#d7e7de">One universe, one period, six constructed leaks. Rates are calibration properties, not universal laws. A non-significant audit can be a power problem, not a clean result.</p>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:22px">
+          <figure class="figure reveal">
+            <img src="results/figures/sr_by_family.png" alt="Bar chart of mean annualized Sharpe ratio by family, showing the honest control and six contaminated families." width="1512" height="756" loading="lazy">
+            <figcaption>The published figure, generated from the committed per-replicate table. The target-feature leak dominates the scale; the small leaks are the hard cases.</figcaption>
+          </figure>
+          <figure class="figure reveal">
+            <img src="results/figures/detection_tpr.png" alt="Detection rates by diagnostic and family at calibrated false-positive rates." width="1655" height="792" loading="lazy">
+            <figcaption>Detection is not one number. DSR and the nominal reality check are publication filters; the composite and audit answer different questions.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="faq">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-no">12 / FAQ</div>
+          <div>
+            <h2>Questions a smart reader asks.</h2>
+            <p>Short answers, with the caveat where it matters.</p>
+          </div>
+        </div>
+        <div class="faq reveal">
+          <details open>
+            <summary>Is this a trading strategy?</summary>
+            <p>No. It is a benchmark for evaluating backtests. The honest pipeline is a controlled reference, not an investment product. Nothing here is investment advice.</p>
+          </details>
+          <details>
+            <summary>Does a high Sharpe ratio mean someone cheated?</summary>
+            <p>No. It means the result deserves a clean re-run and a look at data timing, universe construction, and selection. Leakage is one explanation among many, including skill, luck, and a favorable regime.</p>
+          </details>
+          <details>
+            <summary>Why is the composite false-positive rate 3.8% instead of 5%?</summary>
+            <p>The gate is calibrated at the honest 95th percentile, but with 80 honest replicates the empirical rate is discrete. Three of 80 is 3.75%, reported as 3.8%. That is the measured calibration, not a claim of exact 5% control.</p>
+          </details>
+          <details>
+            <summary>Why is the audit false-positive rate 0%?</summary>
+            <p>Because the honest comparator is deterministic and identical to the honest run. The honest audit p-value is exactly 1 by construction. That 0% is not an empirical estimate and should not be transplanted to independent reimplementations.</p>
+          </details>
+          <details>
+            <summary>Why does the audit miss the full-sample leak?</summary>
+            <p>The leak adds only +0.159 Sharpe. Over a fourteen-year test window, that difference is often inside the sampling noise. The audit is a validity check with a power curve, not a binary oracle.</p>
+          </details>
+          <details>
+            <summary>Can I use this on my own strategy?</summary>
+            <p>Yes. The harness is MIT licensed and Docker-ready. Adapt the data loader and candidate pool, keep the pairing, and re-calibrate the thresholds on your own honest controls. Do not transplant the 3.8% rate.</p>
+          </details>
+          <details>
+            <summary>Is the raw Yahoo data redistributed?</summary>
+            <p>No. The raw responses are cached locally and hashed; users should refetch them subject to Yahoo’s terms. The processed panel can be rebuilt from the cache.</p>
+          </details>
+          <details>
+            <summary>What is the biggest limitation?</summary>
+            <p>External validity. The rates describe six constructed mechanisms on one ETF universe and one period. They show what can happen under controlled conditions; they do not estimate prevalence or prove that any particular manager is contaminated.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cta">
+      <div class="wrap">
+        <div class="quote-band reveal" style="text-align:center;background:#0c7a63;color:#fff">
+          <p style="font-size:clamp(2rem,4.8vw,3.4rem)">Bring a backtest.<br>Leave with a question.</p>
+          <small style="color:#d7f3e8;max-width:620px;margin-inline:auto">Run the benchmark, take the checklist to your next research review, or fork the harness and test a diagnostic of your own.</small>
+          <div class="hero-actions" style="justify-content:center;margin-top:24px">
+            <a class="btn btn-primary" href="#checklist">Open the checklist</a>
+            <a class="btn btn-ghost" href="#quiz">Take the quiz</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-copy">
+          <div class="footer-brand"><img src="assets/logo.svg" alt="" width="38" height="38"> FakeAlpha Benchmark</div>
+          <p>A paired, live-market benchmark for backtest integrity. Research software, not investment advice. Past performance, especially contaminated past performance, is not indicative of future results.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <a href="#evidence">The evidence</a>
+          <a href="#leaks">Leak library</a>
+          <a href="#beginner">Beginner guide</a>
+          <a href="#quiz">Quiz</a>
+        </div>
+        <div class="footer-col">
+          <h4>Artifacts</h4>
+          <a href="README.md">README</a>
+          <a href="paper/paper.md">Technical paper</a>
+          <a href="docs/data_card.md">Data card</a>
+          <a href="docs/model_card.md">Model card</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>FakeAlpha Benchmark v0.1 · October 2026 · MIT</span>
+        <span>Live data through 23 October 2026 · Seed 20261025</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const qs = (selector, scope) => (scope || document).querySelector(selector);
+      const qsa = (selector, scope) => Array.from((scope || document).querySelectorAll(selector));
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const savedTheme = localStorage.getItem('fakealpha-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        root.dataset.theme = savedTheme;
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        root.dataset.theme = 'dark';
+      }
+      const themeButton = qs('#theme-toggle');
+      const sun = qs('.sun', themeButton);
+      const moon = qs('.moon', themeButton);
+      function syncThemeButton() {
+        const dark = root.dataset.theme === 'dark';
+        sun.hidden = dark;
+        moon.hidden = !dark;
+        themeButton.setAttribute('aria-pressed', String(dark));
+        themeButton.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+      }
+      syncThemeButton();
+      themeButton.addEventListener('click', () => {
+        root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('fakealpha-theme', root.dataset.theme);
+        syncThemeButton();
+      });
+
+      const header = qs('#site-header');
+      const navToggle = qs('#nav-toggle');
+      navToggle.addEventListener('click', () => {
+        const open = header.classList.toggle('nav-open');
+        navToggle.setAttribute('aria-expanded', String(open));
+        navToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      });
+      qsa('#site-nav a').forEach((link) => link.addEventListener('click', () => {
+        header.classList.remove('nav-open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.setAttribute('aria-label', 'Open navigation');
+      }));
+
+      const progress = qs('#scroll-progress');
+      function onScroll() {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        progress.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+        header.classList.toggle('scrolled', window.scrollY > 8);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      qsa('.reveal, .stagger').forEach((el) => revealObserver.observe(el));
+
+      const countObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const target = Number(el.dataset.count);
+          const decimals = Number(el.dataset.decimals || 0);
+          if (reduceMotion) {
+            el.textContent = target.toFixed(decimals);
+          } else {
+            const start = performance.now();
+            const duration = 900;
+            function tick(now) {
+              const t = Math.min(1, (now - start) / duration);
+              const eased = 1 - Math.pow(1 - t, 3);
+              el.textContent = (target * eased).toFixed(decimals);
+              if (t < 1) requestAnimationFrame(tick);
+              else el.textContent = target.toFixed(decimals);
+            }
+            requestAnimationFrame(tick);
+          }
+          countObserver.unobserve(el);
+        });
+      }, { threshold: 0.5 });
+      qsa('[data-count]').forEach((el) => countObserver.observe(el));
+
+      const leaks = {
+        same: {
+          tag: 'Timing', title: 'Same-bar fill',
+          what: 'The portfolio is formed from today’s close and also earns today’s close-to-close return. The decision and the fill use the same price, so the strategy effectively trades on a return it has already seen.',
+          quote: 'If you decide at the close and fill at the same close, the next move is not a forecast. It is a receipt.',
+          sr: '2.048', lift: '+1.227', composite: '100%', audit: '100%',
+          why: 'This is the classic look-ahead fill. It is large enough for both the returns-only composite and the paired audit to detect it in every replicate.'
+        },
+        target: {
+          tag: 'Feature leak', title: 'Target feature',
+          what: 'A feature contains the next period’s return—or a transformation of it—so the model is trained and scored on information from the future. The model looks prophetic because the answer is in the inputs.',
+          quote: 'The most accurate feature in the dataset is often the label wearing a disguise.',
+          sr: '6.842', lift: '+6.021', composite: '100%', audit: '100%',
+          why: 'The leak is enormous: mean Sharpe rises 8.3× above the honest control. Both the composite and the audit catch it, but that is a statement about effect size, not a universal guarantee.'
+        },
+        full: {
+          tag: 'Preprocessing leak', title: 'Full-sample encoding',
+          what: 'An asset is selected or encoded using a statistic computed over the entire history, including the years being evaluated. The test period helps choose the winner before the test begins.',
+          quote: 'A full-history ranking is a time machine disguised as a preprocessing step.',
+          sr: '0.980', lift: '+0.159', composite: '100%', audit: '3.8%',
+          why: 'The lift is small enough to hide inside sampling noise. The composite catches it because the return pattern is suspicious; the audit flags only 3 of 80 runs. A non-significant audit is not a clean bill of health.'
+        },
+        shuffle: {
+          tag: 'Validation leak', title: 'Shuffled cross-validation',
+          what: 'Rows are shuffled before cross-validation, so the training set contains observations from later dates. The model learns from the future and is then evaluated on the past.',
+          quote: 'Shuffling a time series is not a robustness check. It is a promise to break the only thing that makes the test honest.',
+          sr: '0.990', lift: '+0.169', composite: '55.0%', audit: '35.0%',
+          why: 'This is the composite’s blind spot: the leak is real but small, and detection is close to a coin flip. The audit is weaker still at this effect size.'
+        },
+        survivor: {
+          tag: 'Universe leak', title: 'Survivorship',
+          what: 'The universe contains only the funds that are alive today. Failed or closed funds disappear from history, so the backtest is conditioned on survival and inherits a selection advantage.',
+          quote: 'If the graveyard is missing from the dataset, the survivors will always look above average.',
+          sr: '1.198', lift: '+0.377', composite: '100%', audit: '67.5%',
+          why: 'The composite catches the distorted return pattern in every replicate. The audit is less reliable because the re-run sees a different—and counterfactually cleaner—universe.'
+        },
+        phack: {
+          tag: 'Selection leak', title: 'P-hacked selection',
+          what: 'Many variants are tried, and the best test-year result is reported. The winner is chosen after seeing the evaluation window, so the reported Sharpe is a maximum, not an out-of-sample estimate.',
+          quote: 'The best of twenty backtests is not a backtest. It is a search result.',
+          sr: '1.477', lift: '+0.656', composite: '100%', audit: '96.3%',
+          why: 'Both screens perform well because the selection advantage is large. The audit succeeds by comparing the reported run with an honest re-execution, not by trusting the headline number.'
+        }
+      };
+
+      const leakPanel = qs('#leak-panel');
+      const tabs = qsa('.tab');
+      function setLeak(key, focusTab) {
+        const data = leaks[key];
+        if (!data) return;
+        tabs.forEach((tab) => {
+          const active = tab.dataset.leak === key;
+          tab.setAttribute('aria-selected', String(active));
+          tab.tabIndex = active ? 0 : -1;
+          if (active && focusTab) tab.focus();
+        });
+        leakPanel.setAttribute('aria-labelledby', 'tab-' + key);
+        qs('#leak-tag').textContent = data.tag;
+        qs('#leak-title').textContent = data.title;
+        qs('#leak-what').textContent = data.what;
+        qs('#leak-quote').textContent = '“' + data.quote + '”';
+        qs('#leak-sr').textContent = data.sr;
+        qs('#leak-lift').textContent = data.lift;
+        qs('#leak-composite').textContent = data.composite;
+        qs('#leak-audit').textContent = data.audit;
+        qs('#leak-why').textContent = data.why;
+      }
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => setLeak(tab.dataset.leak, false));
+        tab.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          let next = index;
+          if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+          if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+          if (event.key === 'Home') next = 0;
+          if (event.key === 'End') next = tabs.length - 1;
+          setLeak(tabs[next].dataset.leak, true);
+        });
+      });
+      setLeak('same', false);
+
+      const quiz = [
+        {
+          level: 'Foundation',
+          question: 'What is a backtest?',
+          options: [
+            'A replay of a trading rule on historical data',
+            'A guarantee that a strategy will make money',
+            'A live brokerage account',
+            'A way to predict tomorrow’s news'
+          ],
+          answer: 0,
+          explanation: 'A backtest applies a rule to past data. It is evidence about that replay, not a promise about the future.'
+        },
+        {
+          level: 'Foundation',
+          question: 'What makes leakage different from ordinary bad luck?',
+          options: [
+            'The strategy loses money in every month',
+            'The pipeline uses information that was not available at the decision time',
+            'The dataset contains only large companies',
+            'The Sharpe ratio is below one'
+          ],
+          answer: 1,
+          explanation: 'Leakage is a validity failure: a decision uses information from the future. Bad luck is a noisy outcome from a valid process.'
+        },
+        {
+          level: 'Foundation',
+          question: 'What does the Sharpe ratio summarize?',
+          options: [
+            'Return per unit of volatility',
+            'The number of trades in a year',
+            'The probability that a strategy is honest',
+            'The size of the dataset'
+          ],
+          answer: 0,
+          explanation: 'Sharpe is return divided by volatility. A smoother ride for the same return produces a higher Sharpe—but not proof that the pipeline was valid.'
+        },
+        {
+          level: 'Mechanics',
+          question: 'A strategy decides at today’s close and fills at the same close. Which leak is this?',
+          options: [
+            'Survivorship',
+            'Same-bar fill',
+            'Full-sample encoding',
+            'P-hacked selection'
+          ],
+          answer: 1,
+          explanation: 'The decision and the fill use the same price, so the strategy earns today’s close-to-close return after seeing the close. That is a same-bar timing leak.'
+        },
+        {
+          level: 'Mechanics',
+          question: 'A model uses next week’s return as an input feature. What is the label doing?',
+          options: [
+            'It is lagged correctly',
+            'It is used as a feature, which leaks the answer',
+            'It is removed from the dataset',
+            'It is only used in the test set'
+          ],
+          answer: 1,
+          explanation: 'The target is supposed to be predicted, not supplied. Putting it in the features makes the model look accurate because the answer is already in the inputs.'
+        },
+        {
+          level: 'Mechanics',
+          question: 'An asset is ranked by its return over the full history, including the test years. Why is that a leak?',
+          options: [
+            'It makes the dataset smaller',
+            'The test period helps choose the winner before evaluation',
+            'It changes the trading cost',
+            'It removes the need for a benchmark'
+          ],
+          answer: 1,
+          explanation: 'The selection statistic sees the evaluation window. The test years are no longer out of sample; they helped pick the portfolio.'
+        },
+        {
+          level: 'Mechanics',
+          question: 'Why is shuffled cross-validation dangerous for time-series data?',
+          options: [
+            'It makes the model too simple',
+            'It randomly puts future observations in the training set',
+            'It always lowers the Sharpe ratio',
+            'It removes the need for an embargo'
+          ],
+          answer: 1,
+          explanation: 'Shuffling breaks chronological order. The model can train on later dates and be tested on earlier ones, which is not a realistic forecast.'
+        },
+        {
+          level: 'Diagnostics',
+          question: 'What question does the deflated Sharpe ratio (DSR) actually answer?',
+          options: [
+            'Was the backtest implemented without look-ahead?',
+            'Is the Sharpe surprising given the number and dispersion of trials?',
+            'Does the universe contain failed funds?',
+            'Is the code reproducible?'
+          ],
+          answer: 1,
+          explanation: 'DSR is a publication filter for selection and non-normality. It does not inspect the implementation, and leakage can raise it.'
+        },
+        {
+          level: 'Diagnostics',
+          question: 'The composite screen has an empirical false-positive rate of 3.8%. What does that mean here?',
+          options: [
+            'It misses 3.8% of all leaks',
+            'It flagged 3 of 80 honest controls',
+            'It is guaranteed to be exactly 5% in every dataset',
+            'It catches 3.8% of target leaks'
+          ],
+          answer: 1,
+          explanation: 'The rate is discrete: 3 of 80 honest runs is 3.75%, reported as 3.8%. It is a calibration result for this benchmark, not a universal constant.'
+        },
+        {
+          level: 'Judgment',
+          question: 'Why can the paired artifact audit miss the full-sample leak?',
+          options: [
+            'The leak adds only +0.159 Sharpe, so the difference is often inside sampling noise',
+            'The audit never uses the honest return series',
+            'The full-sample leak is too large to measure',
+            'The audit only works on shuffled data'
+          ],
+          answer: 0,
+          explanation: 'The audit has a power curve. A small leak can be real and still fail to clear the significance threshold. A non-significant audit is not proof of validity.'
+        },
+        {
+          level: 'Judgment',
+          question: 'A manager presents a Sharpe ratio of 6.8. What is the best first response?',
+          options: [
+            'Allocate immediately; the number is too high to ignore',
+            'Reject it; any high Sharpe must be fraud',
+            'Ask for a clean re-run and audit the data timing, universe, and selection',
+            'Ignore the number and check the fund’s logo'
+          ],
+          answer: 2,
+          explanation: 'An extreme result is a reason to audit, not a verdict. It could be skill, luck, a favorable regime, or a leak. The pipeline is what you diligence.'
+        },
+        {
+          level: 'Judgment',
+          question: 'Which statement best captures the benchmark’s central conclusion?',
+          options: [
+            'DSR and reality checks are useless and should be deleted',
+            'No returns-only statistic proves a backtest is valid; extreme performance should trigger an audit',
+            'A high Sharpe ratio is proof of a clean implementation',
+            'PBO catches every possible selection rule'
+          ],
+          answer: 1,
+          explanation: 'The diagnostics answer different questions. DSR and reality checks are publication filters; PBO and split-half have blind spots; the audit has power limits. None replaces a validity review.'
+        }
+      ];
+
+      const quizStage = qs('#quiz-stage');
+      const quizForm = qs('#quiz-form');
+      const quizOptions = qs('#quiz-options');
+      const quizQuestion = qs('#quiz-question');
+      const quizSubmit = qs('#quiz-submit');
+      const quizFeedback = qs('#quiz-feedback');
+      const quizNextWrap = qs('#quiz-next-wrap');
+      const quizNext = qs('#quiz-next');
+      const quizResult = qs('#quiz-result');
+      const quizScore = qs('#quiz-score');
+      const quizTier = qs('#quiz-tier');
+      const quizSummary = qs('#quiz-summary');
+      const quizMissed = qs('#quiz-missed');
+      const quizRestart = qs('#quiz-restart');
+      let quizIndex = 0;
+      let quizScoreValue = 0;
+      let quizAnswered = false;
+      let missed = [];
+
+      function renderQuestion(focus) {
+        const item = quiz[quizIndex];
+        quizAnswered = false;
+        quizQuestion.textContent = item.question;
+        qs('#quiz-level').textContent = item.level;
+        qs('#quiz-count').textContent = 'Question ' + (quizIndex + 1) + ' of ' + quiz.length;
+        qs('#quiz-progress').style.width = ((quizIndex / quiz.length) * 100) + '%';
+        quizOptions.innerHTML = '';
+        item.options.forEach((option, index) => {
+          const label = document.createElement('label');
+          label.className = 'quiz-option';
+          label.innerHTML = '<input type="radio" name="quiz-option" value="' + index + '"><span class="letter">' + String.fromCharCode(65 + index) + '</span><span>' + option + '</span>';
+          quizOptions.appendChild(label);
+        });
+        quizFeedback.hidden = true;
+        quizFeedback.className = 'feedback';
+        quizFeedback.innerHTML = '';
+        quizNextWrap.hidden = true;
+        quizSubmit.disabled = false;
+        quizSubmit.textContent = 'Check answer';
+        if (focus) quizQuestion.focus({ preventScroll: true });
+      }
+
+      quizForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (quizAnswered) return;
+        const selected = quizForm.querySelector('input[name="quiz-option"]:checked');
+        if (!selected) {
+          quizFeedback.hidden = false;
+          quizFeedback.className = 'feedback bad';
+          quizFeedback.innerHTML = '<b>Choose an answer first.</b>There is no penalty for guessing, but commit to one option.';
+          return;
+        }
+        quizAnswered = true;
+        const item = quiz[quizIndex];
+        const chosen = Number(selected.value);
+        const correct = chosen === item.answer;
+        if (correct) quizScoreValue += 1;
+        else missed.push({ question: item.question, answer: item.options[item.answer] });
+        qsa('input[name="quiz-option"]').forEach((input) => { input.disabled = true; });
+        qsa('.quiz-option').forEach((label, index) => {
+          if (index === item.answer) label.classList.add('correct');
+          if (index === chosen && !correct) label.classList.add('wrong');
+        });
+        quizFeedback.hidden = false;
+        quizFeedback.className = 'feedback ' + (correct ? 'good' : 'bad');
+        quizFeedback.innerHTML = '<b>' + (correct ? 'Correct.' : 'Not quite.') + '</b>' + item.explanation;
+        quizSubmit.disabled = true;
+        quizSubmit.textContent = correct ? 'Correct' : 'Review the explanation';
+        quizNextWrap.hidden = false;
+        quizNext.textContent = quizIndex === quiz.length - 1 ? 'See my result' : 'Next question';
+        quizNext.focus({ preventScroll: true });
+      });
+
+      quizNext.addEventListener('click', () => {
+        if (quizIndex < quiz.length - 1) {
+          quizIndex += 1;
+          renderQuestion(true);
+          return;
+        }
+        quizStage.hidden = true;
+        quizResult.hidden = false;
+        quizScore.textContent = quizScoreValue + ' / ' + quiz.length;
+        const tiers = [
+          { min: 11, title: 'Leak detective', summary: 'You can spot the mechanisms, the misleading statistics, and the limits of the audit. Read the paper next; you are ready for it.' },
+          { min: 8, title: 'Strong practitioner', summary: 'You have the core model. Revisit the diagnostic rows and the full-sample blind spot, then try the checklist on a real backtest.' },
+          { min: 5, title: 'Getting dangerous', summary: 'The foundations are there. Walk the beginner path once more, then retake the quiz without looking at the explanations.' },
+          { min: 0, title: 'Start with the replay', summary: 'Read the beginner guide from the top, then come back. The goal is not memorizing numbers; it is learning to ask what the pipeline knew.' }
+        ];
+        const tier = tiers.find((entry) => quizScoreValue >= entry.min);
+        quizTier.textContent = tier.title;
+        quizSummary.textContent = tier.summary;
+        if (missed.length) {
+          quizMissed.innerHTML = '<b>Worth revisiting:</b><br>' + missed.map((item) => '• ' + item.question + ' <em>(' + item.answer + ')</em>').join('<br>');
+          quizMissed.hidden = false;
+        } else {
+          quizMissed.innerHTML = '<b>Clean sweep.</b> Now audit a real backtest; the quiz is easier than the job.';
+          quizMissed.hidden = false;
+        }
+        quizResult.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        quizRestart.focus({ preventScroll: true });
+      });
+
+      quizRestart.addEventListener('click', () => {
+        quizIndex = 0;
+        quizScoreValue = 0;
+        missed = [];
+        quizResult.hidden = true;
+        quizStage.hidden = false;
+        renderQuestion();
+      });
+      renderQuestion();
+
+      const checkItems = qsa('[data-check]');
+      const checkCount = qs('#check-count');
+      const checkBar = qs('#check-bar');
+      const checkMessage = qs('#check-message');
+      function updateChecklist() {
+        const done = checkItems.filter((item) => item.checked).length;
+        const total = checkItems.length;
+        checkCount.textContent = String(done);
+        checkBar.style.width = ((done / total) * 100) + '%';
+        const messages = [
+          'Check the items that are true. A perfect score is a starting point, not a guarantee.',
+          'A start. The missing items are the most useful part of the review.',
+          'The basics are forming. Nail down the selection and audit questions next.',
+          'Halfway there. The gaps are now specific enough to assign.',
+          'A solid base. Check the hard cases: point-in-time data and audit power.',
+          'Strong hygiene. Retest the claims on a strategy you did not build.',
+          'Very strong. Now verify that each “yes” has an artifact behind it.',
+          'Almost complete. The last item is usually the one that changes the decision.',
+          'Complete on paper. A perfect score is not a certification; demand the evidence.'
+        ];
+        checkMessage.textContent = messages[done];
+      }
+      checkItems.forEach((item) => item.addEventListener('change', updateChecklist));
+      qs('#check-reset').addEventListener('click', () => {
+        checkItems.forEach((item) => { item.checked = false; });
+        updateChecklist();
+      });
+      updateChecklist();
+
+      const fprRange = qs('#fpr-range');
+      const fprOutput = qs('#fpr-output');
+      const fprCount = qs('#fpr-count');
+      const fprTotal = qs('#fpr-total');
+      const fprExpected = qs('#fpr-expected');
+      function updateFpr() {
+        const total = Number(fprRange.value);
+        const expected = total * 0.0375;
+        fprOutput.textContent = String(total);
+        fprTotal.textContent = String(total);
+        fprCount.textContent = String(Math.max(1, Math.round(expected)));
+        fprExpected.textContent = '3.8% × ' + total + ' ≈ ' + Math.max(1, Math.round(expected));
+      }
+      fprRange.addEventListener('input', updateFpr);
+      updateFpr();
+
+      qsa('[data-copy]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const text = button.getAttribute('data-copy');
+          try {
+            await navigator.clipboard.writeText(text);
+            button.textContent = 'Copied';
+            setTimeout(() => { button.textContent = 'Copy'; }, 1600);
+          } catch (error) {
+            button.textContent = 'Select & copy';
+          }
+        });
+      });
+
+      if (!('IntersectionObserver' in window)) {
+        qsa('.reveal, .stagger').forEach((el) => el.classList.add('in'));
+      }
+    })();
+  </script>
+</body>
+</html>

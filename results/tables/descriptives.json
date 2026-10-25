@@ -1,0 +1,164 @@
+{
+  "audit": {
+    "full_sample_target_encoding": {
+      "flag_rate": 0.0375,
+      "median": 0.27145708582834327,
+      "p05": 0.0817365269461077
+    },
+    "honest": {
+      "flag_rate": 0.0,
+      "median": 1.0,
+      "p05": 1.0
+    },
+    "p_hacked_selection": {
+      "flag_rate": 0.9625,
+      "median": 0.0079840319361277,
+      "p05": 0.0019960079840319
+    },
+    "same_bar_fill": {
+      "flag_rate": 1.0,
+      "median": 0.0019960079840319,
+      "p05": 0.0019960079840319
+    },
+    "shuffled_cv": {
+      "flag_rate": 0.35,
+      "median": 0.13273453093812376,
+      "p05": 0.0079840319361277
+    },
+    "survivorship": {
+      "flag_rate": 0.675,
+      "median": 0.0169660678642714,
+      "p05": 0.0019960079840319
+    },
+    "target_feature": {
+      "flag_rate": 1.0,
+      "median": 0.0019960079840319,
+      "p05": 0.0019960079840319
+    }
+  },
+  "benchmarks": {
+    "equal_weight_sr": 0.8097882961362043,
+    "equal_weight_vol": 0.13422711922208833,
+    "sixty_forty_sr": 0.9349361527047974,
+    "spy_sr": 0.916717050257032,
+    "spy_vol": 0.16671960617152853
+  },
+  "candidate_correlation": {
+    "mean_pairwise": 0.608683755370761,
+    "n_candidates": 128,
+    "participation_ratio": 2.462399121002925,
+    "pcs_for_90pct": 10
+  },
+  "data": {
+    "DIA": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "f99d25f6264a5636",
+      "status": "ok"
+    },
+    "EEM": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "d95c45e694bb353c",
+      "status": "ok"
+    },
+    "EFA": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "da6da001a044509d",
+      "status": "ok"
+    },
+    "GLD": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "61401f9943f04b9e",
+      "status": "ok"
+    },
+    "HYG": {
+      "coverage_missing": 0.035504,
+      "first": "2007-04-11",
+      "last": "2026-10-23",
+      "rows": 4917,
+      "sha256": "bccaec6943a29d4e",
+      "status": "ok"
+    },
+    "IWM": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "24798b7877b6b52a",
+      "status": "ok"
+    },
+    "QQQ": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "53305d50e6eae7d2",
+      "status": "ok"
+    },
+    "SPY": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "810ba85d72bc8909",
+      "status": "ok"
+    },
+    "TLT": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "de4e0d3aff1ee35f",
+      "status": "ok"
+    },
+    "VNQ": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "8fc728727251f731",
+      "status": "ok"
+    },
+    "XLE": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "a0a52ea10352523b",
+      "status": "ok"
+    },
+    "XLK": {
+      "coverage_missing": 0.035677,
+      "first": "2005-01-03",
+      "last": "2026-10-23",
+      "rows": 5487,
+      "sha256": "2c8e3b30a59326e8",
+      "status": "ok"
+    }
+  },
+  "honest": {
+    "max_sr": 0.9534794709143788,
+    "mean_sr": 0.8210894659154164,
+    "median_sr": 0.8423004615643119,
+    "min_sr": 0.5503005762585444,
+    "sd_sr": 0.08707547971346526
+  },
+  "panel": {
+    "assets": 12,
+    "first": "2007-01-03",
+    "last": "2026-10-23",
+    "rows": 4984,
+    "test_rows": 3520
+  }
+}

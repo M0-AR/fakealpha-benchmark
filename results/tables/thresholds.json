@@ -1,0 +1,50 @@
+{
+  "same_bar_fill": {
+    "threshold_dsr": 0.31661376118734064,
+    "threshold_pbo": 0.3531746031746032,
+    "threshold_reality_check": 0.9898182677074957,
+    "threshold_split_half": 0.48514095819076797,
+    "threshold_audit": 0.95,
+    "threshold_combined": 0.050981517998585635
+  },
+  "target_feature": {
+    "threshold_dsr": 0.31661376118734064,
+    "threshold_pbo": 0.3531746031746032,
+    "threshold_reality_check": 0.9898182677074957,
+    "threshold_split_half": 0.48514095819076797,
+    "threshold_audit": 0.95,
+    "threshold_combined": 0.050981517998585635
+  },
+  "full_sample_target_encoding": {
+    "threshold_dsr": 0.31661376118734064,
+    "threshold_pbo": 0.3531746031746032,
+    "threshold_reality_check": 0.9898182677074957,
+    "threshold_split_half": 0.48514095819076797,
+    "threshold_audit": 0.95,
+    "threshold_combined": 0.050981517998585635
+  },
+  "shuffled_cv": {
+    "threshold_dsr": 0.31661376118734064,
+    "threshold_pbo": 0.3531746031746032,
+    "threshold_reality_check": 0.9898182677074957,
+    "threshold_split_half": 0.48514095819076797,
+    "threshold_audit": 0.95,
+    "threshold_combined": 0.050981517998585635
+  },
+  "survivorship": {
+    "threshold_dsr": 0.31661376118734064,
+    "threshold_pbo": 0.3531746031746032,
+    "threshold_reality_check": 0.9898182677074957,
+    "threshold_split_half": 0.48514095819076797,
+    "threshold_audit": 0.95,
+    "threshold_combined": 0.050981517998585635
+  },
+  "p_hacked_selection": {
+    "threshold_dsr": 0.31661376118734064,
+    "threshold_pbo": 0.3531746031746032,
+    "threshold_reality_check": 0.9898182677074957,
+    "threshold_split_half": 0.48514095819076797,
+    "threshold_audit": 0.95,
+    "threshold_combined": 0.050981517998585635
+  }
+}

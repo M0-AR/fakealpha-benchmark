@@ -1,0 +1,26 @@
+universe:
+  symbols: [SPY, QQQ, IWM, DIA, TLT, GLD, HYG, EEM, EFA, VNQ, XLE, XLK]
+  start: "2007-01-01"
+  history_start: "2005-01-01"
+  end: null
+  source: yahoo_chart_v8
+
+experiment:
+  test_start: 2012
+  test_end: 2025
+  embargo_days: 2
+  cost_bps: 5.0
+  rebalance_freq: "W-FRI"
+  n_replicates: 80
+  n_candidates: 40
+  target_feature_lambda: 1.0
+  bootstrap_samples: 500
+  bootstrap_block: 20
+  random_seed: 20261025
+
+paths:
+  data_raw: data/raw
+  data_processed: data/processed
+  results: results
+  figures: results/figures
+  tables: results/tables
